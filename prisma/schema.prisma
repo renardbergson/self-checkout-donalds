@@ -36,7 +36,7 @@ model MenuCategory {
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
   // the fields below will not be saved in the database, they will only be used to create a relation
-  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   products     Product[]
 }
 
@@ -52,8 +52,8 @@ model Product {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
   // the fields below will not be saved in the database, they're only used to create a relation
-  restaurant     Restaurant     @relation(fields: [restaurantId], references: [id])
-  menuCategory   MenuCategory   @relation(fields: [menuCategoryId], references: [id])
+  restaurant     Restaurant     @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
+  menuCategory   MenuCategory   @relation(fields: [menuCategoryId], references: [id], onDelete: Cascade)
   orderProducts  OrderProduct[]
 }
 
@@ -66,8 +66,8 @@ model OrderProduct {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   // the fields below will not be saved in the database, they're only used to create a relation
-  product   Product  @relation(fields: [productId], references: [id])
-  order     Order    @relation(fields: [orderId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
 }
 
 model Order {
@@ -79,7 +79,7 @@ model Order {
   createdAt         DateTime          @default(now())
   updatedAt         DateTime          @updatedAt
   // the fields below will not be saved in the database, they're only used to create a relation
-  restaurant        Restaurant        @relation(fields: [restaurantId], references: [id])
+  restaurant        Restaurant        @relation(fields: [restaurantId], references: [id], onDelete: Cascade)
   orderProducts     OrderProduct[]
 }
 
