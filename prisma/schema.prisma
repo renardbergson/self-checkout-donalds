@@ -1,0 +1,96 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Restaurant {
+  id             String         @id @default(uuid())
+  // @id makes this field the primary key. @default generates a UUID for each new record if not provided
+  name           String
+  slug           String
+  description    String
+  avatarImageUrl String
+  coverImageUrl  String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt // @updatedAt updates the timestamp whenever the record is modified
+  // the fields below will not be saved in the database, they will only be used to create a relation
+  menuCategories MenuCategory[]
+  products       Product[]
+  Order          Order[]
+}
+
+model MenuCategory {
+  id           String     @id @default(uuid())
+  restaurantId String
+  name         String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  // the fields below will not be saved in the database, they will only be used to create a relation
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  products     Product[]
+}
+
+model Product {
+  id             String         @id @default(uuid())
+  restaurantId   String
+  menuCategoryId String
+  name           String
+  description    String
+  ingredients    String[]
+  price          Float
+  imageUrl       String
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  // the fields below will not be saved in the database, they're only used to create a relation
+  restaurant     Restaurant     @relation(fields: [restaurantId], references: [id])
+  menuCategory   MenuCategory   @relation(fields: [menuCategoryId], references: [id])
+  orderProducts  OrderProduct[]
+}
+
+model OrderProduct {
+  id        String   @id @default(uuid())
+  productId String
+  orderId   Int
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  // the fields below will not be saved in the database, they're only used to create a relation
+  product   Product  @relation(fields: [productId], references: [id])
+  order     Order    @relation(fields: [orderId], references: [id])
+}
+
+model Order {
+  id                Int               @id @default(autoincrement()) // to be more easely indentified 
+  restaurantId      String
+  total             Float
+  status            OrderStatus
+  consumptionMethod ConsumptionMethod
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+  // the fields below will not be saved in the database, they're only used to create a relation
+  restaurant        Restaurant        @relation(fields: [restaurantId], references: [id])
+  orderProducts     OrderProduct[]
+}
+
+enum OrderStatus {
+  PENDING
+  IN_PREPARATION
+  FINISHED
+  CANCELED
+}
+
+enum ConsumptionMethod {
+  TAKEAWAY
+  DINE_IN
+}
