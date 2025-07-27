@@ -31,8 +31,12 @@ const ConsumptionMethodOption = ({
             className="object-contain"
           />
         </div>
-        <Button variant="secondary" className="rounded-full">
-          <Link href={`${slug}/menu?consumptionMethod=${option}`}>
+        <Button variant="secondary" className="rounded-full" asChild>
+          {/* "asChild" makes the Button render its child (<Link>) as the 
+          actual DOM element, while preserving the Button's styles and behaviors. */}
+          <Link
+            href={`${slug}/menu?consumptionMethod=${option.toLocaleLowerCase()}`}
+          >
             {buttonText}
           </Link>
         </Button>
