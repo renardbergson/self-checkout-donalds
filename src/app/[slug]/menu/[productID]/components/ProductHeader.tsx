@@ -1,23 +1,23 @@
 "use client"; // so we can use "useRouter" to go back
 
-import { Restaurant } from "@prisma/client";
+import { Product } from "@prisma/client";
 import { ChevronLeftIcon, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 
-interface HeaderProps {
-  restaurant: Pick<Restaurant, "name" | "coverImageUrl">;
+interface ProductHeaderProps {
+  product: Pick<Product, "name" | "imageUrl">;
   // TypeScript's Pick utility lets us create a new type with only the fields we need.
-  // Here, we extract just "name" and "coverImageUrl" from the full Restaurant type.
+  // Here, we extract just "name" and "imageUrl" from the full Product type.
 }
 
-const Header = ({ restaurant }: HeaderProps) => {
+const ProductHeader = ({ product }: ProductHeaderProps) => {
   const router = useRouter();
 
   return (
-    <div className="relative h-[250px] w-full">
+    <div className="relative min-h-[300px] w-full">
       <Button
         variant="secondary"
         size="icon"
@@ -28,8 +28,8 @@ const Header = ({ restaurant }: HeaderProps) => {
       </Button>
 
       <Image
-        src={restaurant.coverImageUrl}
-        alt={restaurant.name}
+        src={product.imageUrl}
+        alt={product.name}
         fill
         className="object-cover"
       />
@@ -45,4 +45,4 @@ const Header = ({ restaurant }: HeaderProps) => {
   );
 };
 
-export default Header;
+export default ProductHeader;

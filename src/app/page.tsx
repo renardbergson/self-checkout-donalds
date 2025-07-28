@@ -1,13 +1,19 @@
+import Link from "next/link";
+
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 
 const HomePage = () => {
   return (
-    <div>
-      <h1 className="m-5 p-10 text-red-500">Welcome to FSW Donalds</h1>
-      <p>Your favorite fast food restaurant</p>
-      <Input placeholder="Search for food..." className="mb-4" />
-      <Button variant={"default"}>Order Now</Button>
+    <div className="grid h-screen place-content-center">
+      <div className="m-5 p-5">
+        <h1 className="pb-5 text-red-500">
+          Bem-vindo ao self-checkout donalds!
+        </h1>
+        <p className="text-center">Seu restaurante fast food favorito</p>
+      </div>
+      <Button className="text-black" variant={"default"} asChild>
+        <Link href={"/fsw-donalds"}>Iniciar</Link>
+      </Button>
     </div>
   );
 };

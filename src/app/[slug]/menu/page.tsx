@@ -2,9 +2,8 @@ import { notFound } from "next/navigation";
 
 import { database } from "@/lib/prisma";
 
-import Content from "./components/Content";
-import Header from "./components/Header";
-
+import MenuContent from "./components/MenuContent";
+import MenuHeader from "./components/MenuHeader";
 interface RestaurantMenuPageProps {
   params: Promise<{ slug: string }>; // route parameter
   searchParams: Promise<{ consumptionMethod: string }>; // query parameter
@@ -43,8 +42,8 @@ const restaurantMenuPage = async ({
 
   return (
     <div>
-      <Header restaurant={restaurant} />
-      <Content restaurant={restaurant} />
+      <MenuHeader restaurant={restaurant} />
+      <MenuContent restaurant={restaurant} />
     </div>
   );
 };
