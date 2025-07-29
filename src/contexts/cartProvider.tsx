@@ -36,7 +36,26 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     setIsOpen((prev) => !prev);
   }
   function addProduct(product: CartProduct) {
-    setProducts((prev) => [...prev, product]);
+    const productIsAlreadyInTheCart = products.some(
+      (cartProduct) => cartProduct.id === product.id,
+    );
+    // product is being added for the first time
+    if (!productIsAlreadyInTheCart) {
+      return setProducts((prevProducts) => [...prevProducts, product]);
+    }
+    // product is already in the cart
+    setProducts((prevProducts) => {
+      return prevProducts.map((cartProduct) => {
+        if (cartProduct.id === product.id) {
+          return {
+            ...cartProduct,
+            quantity: cartProduct.quantity + product.quantity,
+          };
+        } else {
+          return cartProduct;
+        }
+      });
+    });
   }
 
   return (
