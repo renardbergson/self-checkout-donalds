@@ -3,9 +3,10 @@
 import { Product } from "@prisma/client";
 import { createContext, useState } from "react";
 
-interface CartProduct extends Product {
-  // we extend Product because it doesn't
-  // have the property below
+interface CartProduct
+  extends Pick<Product, "id" | "name" | "price" | "imageUrl"> {
+  // we extend Product (only the fields we need) because
+  // it doesn't have the property below
   quantity: number;
 }
 
@@ -14,6 +15,7 @@ export interface ICartContext {
   isOpen: boolean;
   products: CartProduct[];
   toggleCart: () => void;
+  addProduct: (product: CartProduct) => void;
 }
 
 export const CartContext = createContext<ICartContext>({
@@ -23,13 +25,18 @@ export const CartContext = createContext<ICartContext>({
   isOpen: false,
   products: [],
   toggleCart: () => {},
+  addProduct: () => {},
 });
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const [products, setProducts] = useState<CartProduct[]>([]);
   const [isOpen, setIsOpen] = useState(false);
+
   function toggleCart() {
     setIsOpen((prev) => !prev);
+  }
+  function addProduct(product: CartProduct) {
+    setProducts((prev) => [...prev, product]);
   }
 
   return (
@@ -39,6 +46,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         isOpen: isOpen,
         products: products,
         toggleCart: toggleCart,
+        addProduct: addProduct,
       }}
     >
       {children}
