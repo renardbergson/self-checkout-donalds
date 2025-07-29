@@ -8,11 +8,14 @@ import {
   NotebookPen,
 } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useContext, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { CartContext } from "@/contexts/cartProvider";
 import { formatCurrency } from "@/helpers/formatCurrency";
+
+import CartSheet from "./CartSheet";
 
 interface ProductContentProps {
   /* 
@@ -32,12 +35,17 @@ interface ProductContentProps {
 }
 
 const ProductContent = ({ product }: ProductContentProps) => {
+  const { toggleCart } = useContext(CartContext);
   const [quantity, setQuantity] = useState(1);
+
   function handleDecreaseQuantity() {
     return setQuantity((prev) => (prev > 1 ? prev - 1 : prev));
   }
   function handleIncreaseQuantity() {
     return setQuantity((prev) => prev + 1);
+  }
+  function handleAddToCart() {
+    toggleCart();
   }
 
   return (
@@ -116,7 +124,12 @@ const ProductContent = ({ product }: ProductContentProps) => {
       </div>
 
       {/* Adicionar à sacola */}
-      <Button className="mt-6 w-full rounded-full">Adicionar à sacola</Button>
+      <Button className="mt-6 w-full rounded-full" onClick={handleAddToCart}>
+        Adicionar à sacola
+      </Button>
+
+      {/* Cart Sheet */}
+      <CartSheet />
     </div>
   );
 };
