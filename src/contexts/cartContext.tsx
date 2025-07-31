@@ -3,7 +3,7 @@
 import { Product } from "@prisma/client";
 import { createContext, useState } from "react";
 
-interface CartProduct
+export interface CartProduct
   extends Pick<Product, "id" | "name" | "price" | "imageUrl"> {
   // we extend Product (only the fields we need) because
   // it doesn't have the property below
@@ -16,6 +16,9 @@ export interface ICartContext {
   products: CartProduct[];
   toggleCart: () => void;
   addProduct: (product: CartProduct) => void;
+  decreaseProductQuantity: (productID: string) => void;
+  increaseProductQuantity: (productID: string) => void;
+  removeProduct: (productID: string) => void;
 }
 
 export const CartContext = createContext<ICartContext>({
@@ -26,6 +29,9 @@ export const CartContext = createContext<ICartContext>({
   products: [],
   toggleCart: () => {},
   addProduct: () => {},
+  decreaseProductQuantity: () => {},
+  increaseProductQuantity: () => {},
+  removeProduct: () => {},
 });
 
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
@@ -35,6 +41,7 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   function toggleCart() {
     setIsOpen((prev) => !prev);
   }
+
   function addProduct(product: CartProduct) {
     const productIsAlreadyInTheCart = products.some(
       (cartProduct) => cartProduct.id === product.id,
@@ -58,6 +65,44 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     });
   }
 
+  function decreaseProductQuantity(productID: string) {
+    setProducts((prevProducts) => {
+      return prevProducts.map((cartProduct) => {
+        // it's not the product we're interested in
+        if (cartProduct.id !== productID) {
+          return cartProduct;
+        }
+        // this is the product we might want to decrease quantity
+        if (cartProduct.quantity === 1) {
+          return cartProduct;
+        } else {
+          return { ...cartProduct, quantity: cartProduct.quantity - 1 };
+        }
+      });
+    });
+  }
+
+  function increaseProductQuantity(productID: string) {
+    setProducts((prevProducts) => {
+      return prevProducts.map((cartProduct) => {
+        if (cartProduct.id !== productID) {
+          return cartProduct;
+        } else {
+          return {
+            ...cartProduct,
+            quantity: cartProduct.quantity + 1,
+          };
+        }
+      });
+    });
+  }
+
+  function removeProduct(productID: string) {
+    setProducts((prevProducts) =>
+      prevProducts.filter((cartProduct) => cartProduct.id !== productID),
+    );
+  }
+
   return (
     <CartContext.Provider
       /* real values that will be provided to children components */
@@ -66,6 +111,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         products: products,
         toggleCart: toggleCart,
         addProduct: addProduct,
+        decreaseProductQuantity: decreaseProductQuantity,
+        increaseProductQuantity: increaseProductQuantity,
+        removeProduct: removeProduct,
       }}
     >
       {children}

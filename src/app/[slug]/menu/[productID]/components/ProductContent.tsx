@@ -12,7 +12,7 @@ import { useContext, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { CartContext } from "@/contexts/cartProvider";
+import { CartContext } from "@/contexts/cartContext";
 import { formatCurrency } from "@/helpers/formatCurrency";
 
 import CartSheet from "./CartSheet";
