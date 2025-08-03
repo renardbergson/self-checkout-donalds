@@ -1,3 +1,4 @@
+import { ConsumptionMethod } from "@prisma/client";
 import { notFound } from "next/navigation";
 
 import { database } from "@/lib/prisma";
@@ -7,10 +8,29 @@ import ProductHeader from "./components/ProductHeader";
 
 interface ProductPageProps {
   params: Promise<{ slug: string; productID: string }>;
+  searchParams?: Record<string, string | undefined>;
+  // with Record we're saying: the key is string and the
+  // value can be string or undefined
 }
 
-const ProductPage = async ({ params }: ProductPageProps) => {
+const ProductPage = async ({ params, searchParams }: ProductPageProps) => {
+  // When we're in a server component, Next automatically invokes it's function Page()
+  // with an object containing:
+  // - params: route parameters (like [slug] and [productID])
+  // - searchParams: query parameters (like ?consumptionMethod=...)
+
   const { slug, productID } = await params;
+  const rawConsumptionMethod = searchParams?.consumptionMethod?.toUpperCase();
+  const validConsumptionMethods = Object.values(ConsumptionMethod);
+
+  // We check if the consumptionMethod is valid before proceeding to fetch the product
+  if (
+    !rawConsumptionMethod ||
+    !validConsumptionMethods.includes(rawConsumptionMethod as ConsumptionMethod)
+  ) {
+    return notFound();
+  }
+
   const product = await database.product.findUnique({
     where: { id: productID },
     include: {
@@ -27,15 +47,19 @@ const ProductPage = async ({ params }: ProductPageProps) => {
       },
     },
   });
+
   if (!product) {
     return notFound();
   }
-  // If this product > restaurant/slug is different of slug from url, return notFound()
-  // For example, that means: this product does not belong to the restaurant (slug) in
-  // the URL
-  if (product.restaurant.slug.toLocaleLowerCase() !== slug.toLowerCase()) {
+
+  if (product.restaurant.slug.toLowerCase() !== slug.toLowerCase()) {
+    // If the found product and it's restaurant/slug is different of slug
+    // from url, return notFound()
+    // For example, that means: this product does not belong to the restaurant
+    // (slug) provided in the URL
     return notFound();
   }
+
   return (
     <div className="flex h-screen flex-auto flex-col">
       <ProductHeader product={product} />

@@ -8,7 +8,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
-import Products from "./MenuProducts";
+import MenuProducts from "./MenuProducts";
 
 interface MenuContentProps {
   restaurant: Prisma.RestaurantGetPayload<{
@@ -77,7 +77,7 @@ const MenuContent = ({ restaurant }: MenuContentProps) => {
 
       <h3 className="px-5 py-2 font-semibold">{selectedCategory.name}</h3>
 
-      <Products products={selectedCategory.products} />
+      <MenuProducts products={selectedCategory.products} />
     </div>
   );
 };

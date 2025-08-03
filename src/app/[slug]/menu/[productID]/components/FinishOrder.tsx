@@ -1,4 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ConsumptionMethod } from "@prisma/client";
+import { useParams, useSearchParams } from "next/navigation";
+import { useContext, useState } from "react";
 import { useForm } from "react-hook-form";
 import { PatternFormat } from "react-number-format";
 import { z } from "zod";
@@ -23,7 +26,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { CartContext } from "@/contexts/cartContext";
 
+import { createOrder } from "../../actions/createOrder";
 import { isValidCpf } from "../../helpers/cpf";
 
 // Form control and validation
@@ -45,6 +50,16 @@ const formSchema = z.object({
 type FormSchema = z.infer<typeof formSchema>;
 
 const FinishOrder = () => {
+  const { slug } = useParams<{ slug: string }>(); // url parameter
+
+  const consumptionMethod = useSearchParams() // query parameter
+    .get("consumptionMethod")
+    ?.toLocaleUpperCase() as ConsumptionMethod;
+
+  const { products } = useContext(CartContext); // products in the cart
+
+  const [drawerIsOpen, setDrawerIsOpen] = useState(true);
+
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -53,19 +68,40 @@ const FinishOrder = () => {
     },
   });
 
+  function handleToggleDrawer() {
+    setDrawerIsOpen((prev) => !prev);
+  }
+
   function handleResetForm() {
+    handleToggleDrawer();
     form.reset();
   }
 
-  function submitForm(data: FormSchema) {
-    console.log(data);
+  async function submitForm(data: FormSchema) {
+    // Let's call the server action here,
+    // so we can call our database
+    try {
+      await createOrder({
+        customerName: data.name,
+        customerCpf: data.cpf,
+        consumptionMethod,
+        products,
+        slug,
+        // the other necessary data is obtained
+        // in the server action (createOrder)!!
+      });
+      handleToggleDrawer();
+      form.reset();
+    } catch (error) {
+      console.error("Error creating order:", error);
+    }
   }
 
   return (
-    <Drawer>
-      <DrawerTrigger asChild>
-        <Button className="w-full rounded-full">Finalizar pedido</Button>
-      </DrawerTrigger>
+    <Drawer open={drawerIsOpen}>
+      <Button className="w-full rounded-full" onClick={handleToggleDrawer}>
+        Finalizar pedido
+      </Button>
       <DrawerContent>
         <DrawerHeader>
           <DrawerTitle>Finalizar Pedido</DrawerTitle>
@@ -125,15 +161,14 @@ const FinishOrder = () => {
                 >
                   Pagamento
                 </Button>
-                <DrawerClose asChild>
-                  <Button
-                    className="rounded-full"
-                    variant="outline"
-                    onClick={handleResetForm}
-                  >
-                    Cancelar
-                  </Button>
-                </DrawerClose>
+
+                <Button
+                  className="rounded-full"
+                  variant="outline"
+                  onClick={handleResetForm}
+                >
+                  Cancelar
+                </Button>
               </DrawerFooter>
             </form>
           </Form>

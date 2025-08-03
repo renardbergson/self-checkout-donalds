@@ -1,7 +1,7 @@
 import { Product } from "@prisma/client";
 import Image from "next/image";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 import { formatCurrency } from "@/helpers/formatCurrency";
 
@@ -30,13 +30,14 @@ const MenuProducts = ({ products }: MenuProductsProps) => {
    */
 
   // So, here we can use hooks...
-  const { slug } = useParams<{ slug: string }>();
+  const { slug } = useParams<{ slug: string }>(); // url parameter
+  const consumptionMethod = useSearchParams().get("consumptionMethod"); // query parameter
 
   return (
     <div className="flex flex-col gap-6 px-5">
       {products.map((product) => (
         <Link
-          href={`/${slug}/menu/${product.id}`}
+          href={`/${slug}/menu/${product.id}?consumptionMethod=${consumptionMethod}`}
           key={product.id}
           className="flex w-full items-center justify-between gap-5 border-b py-3"
         >

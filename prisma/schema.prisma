@@ -61,6 +61,8 @@ model OrderProduct {
 
 model Order {
   id                Int               @id @default(autoincrement())
+  customerName      String
+  customerCpf       String
   restaurantId      String
   total             Float
   status            OrderStatus
