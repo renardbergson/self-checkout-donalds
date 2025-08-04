@@ -161,7 +161,7 @@ const FinishOrder = () => {
                 )}
               />
 
-              <DrawerFooter>
+              <DrawerFooter className="p-0">
                 <Button
                   type="submit"
                   variant="destructive"

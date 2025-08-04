@@ -7,6 +7,7 @@
 "use server"; // Server actions must use this directive
 
 import { ConsumptionMethod } from "@prisma/client";
+import { redirect } from "next/navigation";
 
 import { database } from "@/lib/prisma";
 
@@ -80,4 +81,6 @@ export async function createOrder(data: OrderData) {
       },
     },
   });
+
+  redirect(`/${data.slug}/orders`); // Redirect to the orders page
 }
