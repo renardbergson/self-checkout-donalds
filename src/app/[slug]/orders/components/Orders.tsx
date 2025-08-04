@@ -35,8 +35,17 @@ const Orders = ({ orders }: OrdersProps) => {
     FINISHED: "Finalizado",
   };
 
+  function getOrderTime(time: Date) {
+    const date = new Date(time);
+    const formattedDate = new Intl.DateTimeFormat("pt-BR", {
+      dateStyle: "medium",
+      timeStyle: "short",
+    }).format(date);
+    return formattedDate;
+  }
+
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-8 p-6">
       <Button size="icon" variant="secondary" className="rounded-full">
         <ChevronLeftIcon className="" />
       </Button>
@@ -73,6 +82,10 @@ const Orders = ({ orders }: OrdersProps) => {
                 <p className="text-sm">{orderProduct.product.name}</p>
               </div>
             ))}
+
+            <p className="text-xs text-muted-foreground">
+              {getOrderTime(order.createdAt)}
+            </p>
 
             <Separator />
 

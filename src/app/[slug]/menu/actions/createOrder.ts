@@ -82,5 +82,7 @@ export async function createOrder(data: OrderData) {
     },
   });
 
-  redirect(`/${data.slug}/orders`); // Redirect to the orders page
+  redirect(
+    `/${data.slug}/orders?cpf=${removeCpfPunctuation(data.customerCpf)}`,
+  ); // Redirect to the orders page
 }
