@@ -3,6 +3,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 
+import { Toaster } from "@/components/ui/sonner";
 import { CartProvider } from "@/contexts/cartContext";
 
 const poppins = Poppins({
@@ -24,6 +25,7 @@ export default function RootLayout({
     <html lang="pt-BR" className="h-screen">
       <body className={`${poppins.className} h-full antialiased`}>
         <CartProvider>{children}</CartProvider>
+        <Toaster />
         {/* 
           📌 Interesting: it's possible to render a server component
           inside a client component if the server component is passed

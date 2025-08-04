@@ -1,21 +1,21 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ConsumptionMethod } from "@prisma/client";
+import { Loader2 } from "lucide-react";
 import { useParams, useSearchParams } from "next/navigation";
-import { useContext, useState } from "react";
+import { useContext, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { PatternFormat } from "react-number-format";
+import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
   DrawerFooter,
   DrawerHeader,
   DrawerTitle,
-  DrawerTrigger,
 } from "@/components/ui/drawer";
 import {
   Form,
@@ -56,9 +56,11 @@ const FinishOrder = () => {
     .get("consumptionMethod")
     ?.toLocaleUpperCase() as ConsumptionMethod;
 
+  const [isPending, startTransition] = useTransition();
+
   const { products } = useContext(CartContext); // products in the cart
 
-  const [drawerIsOpen, setDrawerIsOpen] = useState(true);
+  const [drawerIsOpen, setDrawerIsOpen] = useState(false);
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -69,6 +71,7 @@ const FinishOrder = () => {
   });
 
   function handleToggleDrawer() {
+    form.clearErrors();
     setDrawerIsOpen((prev) => !prev);
   }
 
@@ -81,17 +84,22 @@ const FinishOrder = () => {
     // Let's call the server action here,
     // so we can call our database
     try {
-      await createOrder({
-        customerName: data.name,
-        customerCpf: data.cpf,
-        consumptionMethod,
-        products,
-        slug,
-        // the other necessary data is obtained
-        // in the server action (createOrder)!!
+      startTransition(async () => {
+        // isPending is true while this action is being executed
+        await createOrder({
+          customerName: data.name,
+          customerCpf: data.cpf,
+          consumptionMethod,
+          products,
+          slug,
+          // the other necessary data is obtained
+          // in the server action (createOrder)!!
+        });
+
+        handleToggleDrawer();
+        toast.success("Pedido realizado com sucesso!");
+        form.reset();
       });
-      handleToggleDrawer();
-      form.reset();
     } catch (error) {
       console.error("Error creating order:", error);
     }
@@ -158,7 +166,9 @@ const FinishOrder = () => {
                   type="submit"
                   variant="destructive"
                   className="rounded-full"
+                  disabled={isPending}
                 >
+                  {isPending && <Loader2 className="animate-spin" />}
                   Pagamento
                 </Button>
 
