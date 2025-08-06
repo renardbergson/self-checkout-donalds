@@ -107,7 +107,11 @@ const FinishOrder = () => {
 
   return (
     <Drawer open={drawerIsOpen}>
-      <Button className="w-full rounded-full" onClick={handleToggleDrawer}>
+      <Button
+        disabled={!products.length && true}
+        className="w-full rounded-full"
+        onClick={handleToggleDrawer}
+      >
         Finalizar pedido
       </Button>
       <DrawerContent>
