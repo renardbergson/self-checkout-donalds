@@ -8,7 +8,7 @@ import ProductHeader from "./components/ProductHeader";
 
 interface ProductPageProps {
   params: Promise<{ slug: string; productID: string }>;
-  searchParams?: Record<string, string | undefined>;
+  searchParams?: Promise<Record<string, string | undefined>>;
   // with Record we're saying: the key is string and the
   // value can be string or undefined
 }
@@ -20,7 +20,8 @@ const ProductPage = async ({ params, searchParams }: ProductPageProps) => {
   // - searchParams: query parameters (like ?consumptionMethod=...)
 
   const { slug, productID } = await params;
-  const rawConsumptionMethod = searchParams?.consumptionMethod?.toUpperCase();
+  const search = await searchParams;
+  const rawConsumptionMethod = search?.consumptionMethod?.toUpperCase();
   const validConsumptionMethods = Object.values(ConsumptionMethod);
 
   // We check if the consumptionMethod is valid before proceeding to fetch the product
