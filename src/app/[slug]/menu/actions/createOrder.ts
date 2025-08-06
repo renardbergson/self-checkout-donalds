@@ -7,6 +7,7 @@
 "use server"; // Server actions must use this directive
 
 import { ConsumptionMethod } from "@prisma/client";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { database } from "@/lib/prisma";
@@ -81,6 +82,13 @@ export async function createOrder(data: OrderData) {
       },
     },
   });
+
+  revalidatePath(`/${data.slug}/orders`);
+  // 📌 It's advisable to use revalidatePath() when a server action changes data
+  // that is used in an specific page and we want to make sure that page will
+  // reflect the latest data after the action is done.
+  // Without it, the user will be redirected to the page and it might not show
+  // the new order yet...
 
   redirect(
     `/${data.slug}/orders?cpf=${removeCpfPunctuation(data.customerCpf)}`,
