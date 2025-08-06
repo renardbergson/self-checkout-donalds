@@ -14,7 +14,7 @@ import CartItem from "../../components/CartItem";
 import FinishOrder from "./FinishOrder";
 
 const CartSheet = () => {
-  const { isOpen, toggleCart, products, total } = useContext(CartContext);
+  const { isOpen, toggleCart, products, totalPrice } = useContext(CartContext);
 
   return (
     <Sheet open={isOpen} onOpenChange={toggleCart}>
@@ -32,7 +32,7 @@ const CartSheet = () => {
           <Card className="mb-6">
             <CardContent className="flex justify-between p-5 text-sm">
               <p className="text-muted-foreground">Total</p>
-              <p className="font-semibold">{formatCurrency(total)}</p>
+              <p className="font-semibold">{formatCurrency(totalPrice)}</p>
             </CardContent>
           </Card>
 

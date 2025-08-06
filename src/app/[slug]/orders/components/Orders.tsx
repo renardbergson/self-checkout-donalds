@@ -1,6 +1,9 @@
+"use client";
+
 import { OrderStatus, Prisma } from "@prisma/client";
 import { ChevronLeftIcon } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,6 +31,8 @@ interface OrdersProps {
 }
 
 const Orders = ({ orders }: OrdersProps) => {
+  const router = useRouter();
+
   const orderLabels: Record<OrderStatus, string> = {
     PENDING: "Pendente",
     IN_PREPARATION: "Em Preparação",
@@ -46,7 +51,12 @@ const Orders = ({ orders }: OrdersProps) => {
 
   return (
     <div className="space-y-8 p-6">
-      <Button size="icon" variant="secondary" className="rounded-full">
+      <Button
+        size="icon"
+        variant="secondary"
+        className="rounded-full"
+        onClick={() => router.back()}
+      >
         <ChevronLeftIcon className="" />
       </Button>
 
