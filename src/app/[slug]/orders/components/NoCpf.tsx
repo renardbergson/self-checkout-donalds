@@ -57,7 +57,14 @@ const NoCpf = () => {
   }
 
   function submitForm(data: FormSchema) {
-    router.push(`${url}?cpf=${removeCpfPunctuation(data.cpf)}`);
+    router.replace(`${url}?cpf=${removeCpfPunctuation(data.cpf)}`);
+    // 📌 Why use router.replace() instead of router.push()?
+    // - Because we don't want users to go back to the CPF input
+    // screen when clicking the "back" button.
+    // - When you use router.replace() the current URL is replaced
+    // in the browser history, so the previous page (without the CPF
+    // in the URL) is not accessible through router.back() anymore,
+    // only the addres before it
   }
 
   return (
@@ -67,7 +74,7 @@ const NoCpf = () => {
           <DrawerHeader>
             <DrawerTitle>Visualizar Pedidos</DrawerTitle>
             <DrawerDescription>
-              Insira seu CPF para visualizar os pedidos
+              Insira seu CPF para visualizar os pedidos realizados
             </DrawerDescription>
           </DrawerHeader>
 
@@ -102,7 +109,7 @@ const NoCpf = () => {
                     variant="destructive"
                     className="rounded-full"
                   >
-                    Pagamento
+                    Ver Pedidos
                   </Button>
 
                   <Button

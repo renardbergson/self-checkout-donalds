@@ -1,7 +1,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ConsumptionMethod } from "@prisma/client";
 import { Loader2 } from "lucide-react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useContext, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { PatternFormat } from "react-number-format";
@@ -50,6 +50,10 @@ const formSchema = z.object({
 type FormSchema = z.infer<typeof formSchema>;
 
 const FinishOrder = () => {
+  const router = useRouter();
+
+  const { clearCart } = useContext(CartContext);
+
   const { slug } = useParams<{ slug: string }>(); // url parameter
 
   const consumptionMethod = useSearchParams() // query parameter
@@ -86,7 +90,7 @@ const FinishOrder = () => {
     try {
       startTransition(async () => {
         // isPending is true while this action is being executed
-        await createOrder({
+        const order = await createOrder({
           customerName: data.name,
           customerCpf: data.cpf,
           consumptionMethod,
@@ -96,9 +100,16 @@ const FinishOrder = () => {
           // in the server action (createOrder)!!
         });
 
-        handleToggleDrawer();
-        toast.success("Pedido realizado com sucesso!");
-        form.reset();
+        if (order.success) {
+          toast.success("Pedido realizado com sucesso!");
+          handleToggleDrawer();
+          form.reset();
+
+          setTimeout(() => {
+            clearCart();
+            router.push(order.url);
+          }, 1000);
+        }
       });
     } catch (error) {
       console.error("Error creating order:", error);

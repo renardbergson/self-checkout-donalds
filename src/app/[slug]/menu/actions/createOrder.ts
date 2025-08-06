@@ -9,6 +9,7 @@
 import { ConsumptionMethod } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { success } from "zod";
 
 import { database } from "@/lib/prisma";
 
@@ -90,7 +91,8 @@ export async function createOrder(data: OrderData) {
   // Without it, the user will be redirected to the page and it might not show
   // the new order yet...
 
-  redirect(
-    `/${data.slug}/orders?cpf=${removeCpfPunctuation(data.customerCpf)}`,
-  ); // Redirect to the orders page
+  return {
+    success: true,
+    url: `/${data.slug}/orders?cpf=${removeCpfPunctuation(data.customerCpf)}`,
+  };
 }
