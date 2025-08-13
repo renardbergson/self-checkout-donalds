@@ -1,5 +1,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ConsumptionMethod } from "@prisma/client";
+import { loadStripe } from "@stripe/stripe-js";
 import { Loader2 } from "lucide-react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { useContext, useState, useTransition } from "react";
@@ -29,6 +30,7 @@ import { Input } from "@/components/ui/input";
 import { CartContext } from "@/contexts/cartContext";
 
 import { createOrder } from "../../actions/createOrder";
+import { createStripeCheckout } from "../../actions/createStripeCheckout";
 import { isValidCpf } from "../../helpers/cpf";
 
 // Form control and validation
@@ -100,7 +102,7 @@ const FinishOrder = () => {
           // in the server action (createOrder)!!
         });
 
-        if (order.success) {
+        /* if (order.success) {
           toast.success("Pedido realizado com sucesso!");
           handleToggleDrawer();
           form.reset();
@@ -109,7 +111,24 @@ const FinishOrder = () => {
             clearCart();
             router.push(order.url);
           }, 1000);
+        } */
+
+        // STRIPE
+        const { sessionId } = await createStripeCheckout({
+          products,
+          orderId: order.orderId,
+          slug,
+          consumptionMethod,
+        });
+        if (!process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY) {
+          throw new Error("NEXT_PUBLIC_STRIPE_PUBLIC_KEY is not defined");
         }
+
+        const stripe = await loadStripe(
+          process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY,
+        );
+
+        stripe?.redirectToCheckout({ sessionId: sessionId });
       });
     } catch (error) {
       console.error("Error creating order:", error);

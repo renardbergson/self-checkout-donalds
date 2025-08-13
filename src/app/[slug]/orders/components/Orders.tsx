@@ -36,8 +36,9 @@ const Orders = ({ orders }: OrdersProps) => {
 
   const orderLabels: Record<OrderStatus, string> = {
     PENDING: "Pendente",
+    PAYMENT_FAILED: "Não autorizado",
+    PAYMENT_CONFIRMED: "Pagamento Confirmado",
     IN_PREPARATION: "Em Preparação",
-    CANCELED: "Cancelado",
     FINISHED: "Finalizado",
   };
 
@@ -70,7 +71,7 @@ const Orders = ({ orders }: OrdersProps) => {
           <Card key={order.id}>
             <CardContent className="space-y-4 p-5">
               <div
-                className={`w-fit rounded-full px-2 py-1 text-xs font-semibold text-white ${order.status === OrderStatus.FINISHED ? "bg-green-500" : "bg-gray-400"}`}
+                className={`w-fit rounded-full px-2 py-1 text-xs font-semibold text-white ${([OrderStatus.PAYMENT_CONFIRMED, OrderStatus.FINISHED] as OrderStatus[]).includes(order.status) ? "bg-green-500" : "bg-gray-400"}`}
               >
                 {orderLabels[order.status]}
               </div>

@@ -8,7 +8,6 @@
 
 import { ConsumptionMethod } from "@prisma/client";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { success } from "zod";
 
 import { database } from "@/lib/prisma";
@@ -59,7 +58,7 @@ export async function createOrder(data: OrderData) {
     price: productsWithPrices.find((p) => p.id === product.id)!.price,
   }));
 
-  await database.order.create({
+  const order = await database.order.create({
     // 📌 Every field that doesn't have "data." is obtained inside this server action
     // 📌 The other ones are obtained in the client component (FinishOrder.tsx)
     data: {
@@ -92,7 +91,7 @@ export async function createOrder(data: OrderData) {
   // the new order yet...
 
   return {
+    orderId: order.id,
     success: true,
-    url: `/${data.slug}/orders?cpf=${removeCpfPunctuation(data.customerCpf)}`,
   };
 }
