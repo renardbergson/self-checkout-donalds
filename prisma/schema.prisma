@@ -75,9 +75,10 @@ model Order {
 
 enum OrderStatus {
   PENDING
+  PAYMENT_FAILED
+  PAYMENT_CONFIRMED
   IN_PREPARATION
   FINISHED
-  CANCELED
 }
 
 enum ConsumptionMethod {
