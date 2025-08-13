@@ -1,12 +1,12 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ConsumptionMethod } from "@prisma/client";
 import { loadStripe } from "@stripe/stripe-js";
+import Cookies from "js-cookie";
 import { Loader2 } from "lucide-react";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useContext, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { PatternFormat } from "react-number-format";
-import { toast } from "sonner";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -31,7 +31,7 @@ import { CartContext } from "@/contexts/cartContext";
 
 import { createOrder } from "../../actions/createOrder";
 import { createStripeCheckout } from "../../actions/createStripeCheckout";
-import { isValidCpf } from "../../helpers/cpf";
+import { isValidCpf, removeCpfPunctuation } from "../../helpers/cpf";
 
 // Form control and validation
 const formSchema = z.object({
@@ -52,9 +52,7 @@ const formSchema = z.object({
 type FormSchema = z.infer<typeof formSchema>;
 
 const FinishOrder = () => {
-  const router = useRouter();
-
-  const { clearCart } = useContext(CartContext);
+  const cpf = Cookies.get("cpf");
 
   const { slug } = useParams<{ slug: string }>(); // url parameter
 
@@ -72,7 +70,7 @@ const FinishOrder = () => {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "",
-      cpf: "",
+      cpf: cpf ?? "",
     },
   });
 
@@ -89,6 +87,7 @@ const FinishOrder = () => {
   async function submitForm(data: FormSchema) {
     // Let's call the server action here,
     // so we can call our database
+    Cookies.set("cpf", removeCpfPunctuation(data.cpf), { expires: 1 });
     try {
       startTransition(async () => {
         // isPending is true while this action is being executed
@@ -101,17 +100,6 @@ const FinishOrder = () => {
           // the other necessary data is obtained
           // in the server action (createOrder)!!
         });
-
-        /* if (order.success) {
-          toast.success("Pedido realizado com sucesso!");
-          handleToggleDrawer();
-          form.reset();
-
-          setTimeout(() => {
-            clearCart();
-            router.push(order.url);
-          }, 1000);
-        } */
 
         // STRIPE
         const { sessionId } = await createStripeCheckout({

@@ -13,7 +13,6 @@ const WelcomePage = async ({ params }: WelcomePageProps) => {
   const { slug } = await params;
   const restaurant = await database.restaurant.findUnique({ where: { slug } });
 
-  // console.log(restaurant);
   if (!restaurant) {
     return notFound();
   }

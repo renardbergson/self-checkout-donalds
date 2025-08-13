@@ -1,7 +1,8 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { usePathname, useRouter } from "next/navigation";
+import Cookies from "js-cookie";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { PatternFormat } from "react-number-format";
 import { z } from "zod";
@@ -43,7 +44,6 @@ type FormSchema = z.infer<typeof formSchema>;
 
 const NoCpf = () => {
   const router = useRouter();
-  const url = usePathname();
 
   const form = useForm<FormSchema>({
     resolver: zodResolver(formSchema),
@@ -57,14 +57,9 @@ const NoCpf = () => {
   }
 
   function submitForm(data: FormSchema) {
-    router.replace(`${url}?cpf=${removeCpfPunctuation(data.cpf)}`);
-    // 📌 Why use router.replace() instead of router.push()?
-    // - Because we don't want users to go back to the CPF input
-    // screen when clicking the "back" button.
-    // - When you use router.replace() the current URL is replaced
-    // in the browser history, so the previous page (without the CPF
-    // in the URL) is not accessible through router.back() anymore,
-    // only the addres before it
+    const { cpf } = data;
+    Cookies.set("cpf", removeCpfPunctuation(cpf), { expires: 1 });
+    router.refresh(); // we stay in the same page...
   }
 
   return (
